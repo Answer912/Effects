@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>烟花效果</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        html{
+            height: 100%;
+        }
+        body{
+            background-color: #000;
+            height: 100%;
+            overflow: hidden;
+        }
+        .firework{
+            position: absolute;
+            width: 10px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .fire{
+            position: absolute;
+            width: 5px ;
+            height: 5px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    
+    <script>
+        /*
+            面向过程编程思维
+            1、鼠标点击document 生成烟花
+            2、烟花上移到鼠标位置
+            3、烟花爆炸
+            4、烟花碎片，形成效果
+        */
+        // 随机颜色
+        function col () {
+            var r = Math.floor(Math.random()*256);
+            var g = Math.floor(Math.random()*256);
+            var b = Math.floor(Math.random()*256);
+            return (` rgb(${r},${g},${b})`)
+        }
+
+        function createFires (x,y,h) {
+            var n = Math.ceil(Math.random()*50+50)
+            var fires = []
+            for (var i = 0; i < n; i++) {
+                fires[i]  = document.createElement('div');
+                fires[i].className = 'fire'
+                fires[i].style.left = x + 'px'
+                fires[i].style.top = y + 'px'
+                fires[i].speedX = Math.random()*20 -10;
+                fires[i].speedY = Math.random()*20 -10;
+                fires[i].style.backgroundColor = col()
+                document.body.appendChild(fires[i])
+            }
+            setInterval( function () {
+                for (var i = 0; i < n; i++) {
+                    fires[i].style.left = fires[i].offsetLeft + fires[i].speedX + 'px'
+                    fires[i].style.top = fires[i].offsetTop + fires[i].speedY + 'px'
+                    fires[i].speedY +=0.5
+                    if (fires[i].offsetTop>h || fires[i].offsetLeft<0) {
+                        document.body.removeChild(fires[i])
+                    }
+                }
+            },1000/60)
+        }
+
+        document.onclick = function (e) {
+            var e = e || window.event;
+            // 获取鼠标坐标
+            let x = e.clientX,
+                y = e.clientY
+            // 获取body高度
+            let h = document.body.clientHeight;
+
+            // 创建烟花
+
+            var oDiv = document.createElement('div');
+            oDiv.className = 'firework';
+            oDiv.style.left = x + 'px';
+            oDiv.style.top = h + 'px';
+            oDiv.style.backgroundColor = col()
+            // 追加到body中
+            document.body.appendChild(oDiv);
+
+            // 烟花上移
+            let speed = 10 ;
+            var timer = setInterval( function () {
+                oDiv.style.top = oDiv.offsetTop - speed + 'px'
+                // 到鼠标位置不动
+                if (oDiv.offsetTop <= y) {
+                    oDiv.style.top  = y + 'px'
+                    clearInterval(timer)
+                    document.body.removeChild(oDiv)
+                    createFires(x,y,h)
+                }
+            },1000/60)
+        }
+    </script>
+</body>
+</html>
